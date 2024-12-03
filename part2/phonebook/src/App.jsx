@@ -62,13 +62,21 @@ const App = () => {
     const newPerson = {
       name: newName,
       number: newNumber,
-      id: persons.length + 1
+      id: String(persons.length + 1)
     }
     const checkName = persons.find(prop => prop.name.toLowerCase() === newPerson.name.toLowerCase())
     if (checkName) {
-      alert(`${newName} is already added to phonebook`)
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        personService
+          .update(checkName.id, newPerson)
+          .then(updatedPerson => 
+            setPersons(persons => 
+              persons.map((person) => 
+              person.id !== updatedPerson.id ? person : updatedPerson)
+            )
+          )
+      }
     } else {
-
       personService
         .create(newPerson)
         .then(returnedNote => {
@@ -96,14 +104,14 @@ const App = () => {
 
   const handleRemove = (id, name) => {
     if (window.confirm(`Delete ${name}?`)) {
-      personService
-        .remove(id)
-        .then(() =>
-        setPersons(person =>
-          person.filter(person => person.id !== id)
-        ))
+      personService.remove(id).then(() => {
+        setPersons((prevPersons) =>
+          prevPersons.filter((person) => person.id !== id)
+        );
+      });
     }
-  }
+  };
+  
   
   const filteredPersons = persons.filter(person => 
                                           person.name.toLowerCase().includes(filterName.toLowerCase()));
