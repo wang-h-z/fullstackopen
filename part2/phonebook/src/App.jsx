@@ -44,9 +44,9 @@ const App = () => {
     console.log('effect')
     personService
       .getAll()
-      .then(response => {
+      .then(initialPersons => {
         console.log('promise fulfilled')
-        setPersons(response.data)
+        setPersons(initialPersons)
       })
   }, [])
 
@@ -64,8 +64,8 @@ const App = () => {
 
       personService
         .create(newPerson)
-        .then(response => {
-          setPersons(persons.concat(newPerson))
+        .then(returnedNote => {
+          setPersons(persons.concat(returnedNote))
           setNewName('')
           setNumber('')
         })
