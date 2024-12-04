@@ -26,14 +26,14 @@ const PersonForm = ({onSubmit, nameValue, handleNameChange, numberValue, handleN
   )
 }
 
-const Notification = ({ message }) => {
-  if (message === null) {
+const Notification = ({ notification }) => {
+  if (notification === null) {
     return null
   }
 
   return (
-    <div className='error'>
-      {message}
+    <div className={notification.type}>
+      {notification.message}
     </div>
   )
 }
@@ -58,6 +58,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNumber] = useState('')
   const [filterName, setFilterName] = useState('')
+  const [notification, setNotification] = useState(null)
 
   useEffect(() => {
     console.log('effect')
@@ -96,6 +97,13 @@ const App = () => {
           setNewName('')
           setNumber('')
         })
+      setNotification({
+        type: "success",
+        message: `Added ${newPerson.name}`
+      })
+      setTimeout(() => {
+        setNotification(null)
+      }, 5000)
     }
   }
   
@@ -116,12 +124,14 @@ const App = () => {
 
   const handleRemove = (id, name) => {
     if (window.confirm(`Delete ${name}?`)) {
-      personService.remove(id).then(() => {
-        setPersons((prevPersons) =>
+      personService
+        .remove(id)
+        .then(() => {
+          setPersons((prevPersons) =>
           prevPersons.filter((person) => person.id !== id)
-        );
-      });
-    }
+          );
+        })
+      }
   };
   
   
@@ -131,6 +141,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification notification={notification} />
       <Filter value={filterName} onChange={handleFilterChange}/>
       <h3>Add a new</h3>
       <PersonForm
