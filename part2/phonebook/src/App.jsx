@@ -26,6 +26,18 @@ const PersonForm = ({onSubmit, nameValue, handleNameChange, numberValue, handleN
   )
 }
 
+const Notification = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className='error'>
+      {message}
+    </div>
+  )
+}
+
 const Persons = ({persons, handleRemove}) => {
   return (
     <div>
