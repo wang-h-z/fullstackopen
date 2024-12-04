@@ -11,7 +11,6 @@ const Notes = ( {countries, selectCountry} ) =>  {
     }
 
     if (countries.length === 1) {
-        console.log(countries[0])
         return <Country country={countries[0]}></Country>
     }
 
