@@ -86,8 +86,16 @@ const App = () => {
             setPersons(persons => 
               persons.map((person) => 
               person.id !== updatedPerson.id ? person : updatedPerson)
-            )
-          )
+          ))
+          .catch(() => {
+            setNotification({
+              type: "error",
+              message: `Information of ${newName} has already been removed from server`
+            })
+            setTimeout(() => {
+              setNotification(null)
+            }, 5000)
+          })
       }
     } else {
       personService
@@ -131,7 +139,7 @@ const App = () => {
           prevPersons.filter((person) => person.id !== id)
           );
         })
-      }
+    }
   };
   
   
@@ -161,5 +169,4 @@ const App = () => {
 }
 
 export default App
-
 
