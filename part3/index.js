@@ -28,19 +28,37 @@ let persons = [
 ]
 
 app.get('/', (request, response) => {
-    response.send('<h1>Phonebook!!</h1>')
-  })
+  response.send('<h1>Phonebook!!</h1>')
+})
   
-  app.get('/api/persons', (request, response) => {
-    response.json(persons)
-  })
+app.get('/api/persons', (request, response) => {
+  response.json(persons)
+})
 
-app.get('/api/notes/:id', (request, response) => {
+app.get('/info', (request, response) => {
+  const currentTime = new Date()
+  const formattedDate = currentTime.toLocaleString('en-US', {
+    timeZone: 'Europe/Helsinki',
+    weekday: 'short',
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    timeZoneName: 'short',
+  });
+
+  const info = `<p>Phonebook has info for ${persons.length} people</p><p>${formattedDate}</p>`
+  response.send(info)
+})
+
+app.get('/api/persons/:id', (request, response) => {
   const id = request.params.id
-  const note = notes.find(note => note.id === id)
+  const person = persons.find(person => person.id === id)
   
-  if (note) {
-    response.json(note)
+  if (person) {
+    response.json(person)
   } else {
     response.status(404).end()
   }
