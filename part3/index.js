@@ -70,16 +70,32 @@ const generateId = () => {
       : 0
     return String(randomId)
 }
+
+const isDuplicateName = (name) => {
+  return persons.some(person => person.name.toLowerCase() === name.toLowerCase())
+}
   
 app.post('/api/persons', (request, response) => {
     const body = request.body
-    
-    /**if (!body.content) {
-      return response.status(400).json({ 
-        error: 'content missing' 
-      })
-    }
-  */ 
+ 
+  if (!body.name) {
+    return response.status(400).json({
+      error: 'missing name'
+    })
+  }
+  
+  if (!body.number) {
+    console.log("no number")
+    return response.status(400).json({
+      error: 'missing number'
+    })
+  }
+
+  if (isDuplicateName(body.name)) {
+    return response.status(400).json({
+      error: 'name must be unique (case insensitive)'
+    })
+  }
 
   const person = {
     name: body.name,
@@ -87,9 +103,9 @@ app.post('/api/persons', (request, response) => {
     id: generateId(),
   }
   
-  console.log(person)
   persons = persons.concat(person)
-  
+
+  console.log(person)
   response.json(person)
 })
 
