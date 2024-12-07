@@ -65,30 +65,32 @@ app.get('/api/persons/:id', (request, response) => {
 })
 
 const generateId = () => {
-    const maxId = notes.length > 0
-      ? Math.max(...notes.map(n => Number(n.id)))
+    const randomId = persons.length > 0
+      ? Math.floor(Math.random() * 1000000)
       : 0
-    return String(maxId + 1)
+    return String(randomId)
 }
   
-app.post('/api/notes', (request, response) => {
-  const body = request.body
-  
-  if (!body.content) {
-    return response.status(400).json({ 
-      error: 'content missing' 
-    })
-  }
+app.post('/api/persons', (request, response) => {
+    const body = request.body
+    
+    /**if (!body.content) {
+      return response.status(400).json({ 
+        error: 'content missing' 
+      })
+    }
+  */ 
 
-  const note = {
-    content: body.content,
-    important: Boolean(body.important) || false,
+  const person = {
+    name: body.name,
+    number: body.number,
     id: generateId(),
   }
   
-  notes = notes.concat(note)
+  console.log(person)
+  persons = persons.concat(person)
   
-  response.json(note)
+  response.json(person)
 })
 
 app.delete('/api/persons/:id', (request, response) => {
