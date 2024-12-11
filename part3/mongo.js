@@ -11,7 +11,6 @@ const url =
   `mongodb+srv://haozhen:${password}@fullstack.iq9rp.mongodb.net/phonebook?retryWrites=true&w=majority&appName=fullstack`
 
 mongoose.set('strictQuery',false)
-
 mongoose.connect(url)
 
 const personSchema = new mongoose.Schema({
