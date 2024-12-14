@@ -51,9 +51,10 @@ app.get('/info', (request, response) => {
     second: '2-digit',
     timeZoneName: 'short',
   });
-
-  const info = `<p>Phonebook has info for ${persons.length} people</p><p>${formattedDate}</p>`
-  response.send(info)
+  Person.countDocuments({}).then(count=>{
+    const info = `<p>Phonebook has info for ${count} people</p><p>${formattedDate}</p>`
+    response.send(info)
+  })
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
