@@ -105,6 +105,15 @@ const App = () => {
           setNewName('')
           setNumber('')
         })
+        .catch(error=>{
+          setNotification({
+            type:"error",
+            message:error.response.data.error
+          })
+          setTimeout(()=>{
+            setNotification(null)
+          }, 5000)
+        })
       setNotification({
         type: "success",
         message: `Added ${newPerson.name}`

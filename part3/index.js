@@ -117,7 +117,11 @@ app.put('/api/persons/:id', (request, response, next) => {
     number,
   }
 
-  Person.findByIdAndUpdate(id, person)
+  Person.findByIdAndUpdate(id, person, {
+    new: true,
+    runValidators: true,
+    cotnext: 'query',
+  })
     .then((updatedPerson) => {
       if (!updatedPerson) {
         return response.status(404).end()
