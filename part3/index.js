@@ -15,6 +15,16 @@ app.use(
   morgan(':method :url :status :response-time ms - :res[content-length] :body')
 );
 
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } 
+
+  next(error)
+}
+
 const Person = require('./models/person')
 
 app.get('/', (request, response) => {
@@ -22,7 +32,8 @@ app.get('/', (request, response) => {
 })
   
 app.get('/api/persons', (request, response) => {
-  Person.find({}).then(persons=> {
+  Person.find({})
+  .then(persons=> {
     response.json(persons)
   })
 })
@@ -45,15 +56,17 @@ app.get('/info', (request, response) => {
   response.send(info)
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
   const id = request.params.id
-  const person = Person.findById(id).then(person=>{
+  const person = Person.findById(id)
+  .then(person=>{
     if (person) {
       response.json(person)
     } else {
       response.status(404).end()
     }
   })
+  .catch(error=> next(error))
 })
 
 const generateId = () => {
@@ -64,7 +77,7 @@ const generateId = () => {
 }
 
   
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const body = request.body
  
   if (!body.name) {
@@ -85,18 +98,21 @@ app.post('/api/persons', (request, response) => {
     number: body.number,
   })
   
-  person.save().then(savedPerson=>{
+  person.save()
+  .then(savedPerson=>{
     response.json(savedPerson)
   })
+  .catch(error=> next(error))
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
   const id = request.params.id
-  persons = persons.filter(p => p.id !== id)
 
-  Person.findByIdAndDelete(id).then(result=>{
+  Person.findByIdAndDelete(id)
+  .then(result=>{
     response.status(204).end()
   })
+  .catch(error=> next(error))
 })
 
 const unknownEndpoint = (request, response) => {
@@ -105,15 +121,6 @@ const unknownEndpoint = (request, response) => {
 
 app.use(unknownEndpoint)
 
-const errorHandler = (error, request, response, next) => {
-  console.error(error.message)
-
-  if (error.name === 'CastError') {
-    return response.status(400).send({ error: 'malformatted id' })
-  } 
-
-  next(error)
-}
 
 app.use(errorHandler)
 
