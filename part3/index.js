@@ -105,6 +105,25 @@ app.post('/api/persons', (request, response, next) => {
   .catch(error=> next(error))
 })
 
+app.put('/api/persons/:id', (request, response, next) => {
+  const { name, number } = request.body
+  const id = request.params.id
+  
+  const person = {
+    name,
+    number,
+  }
+
+  Person.findByIdAndUpdate(id, person)
+    .then((updatedPerson) => {
+      if (!updatedPerson) {
+        return response.status(404).end()
+      }
+      response.json(updatedPerson)
+    })
+    .catch(error=> next(error))
+})
+
 app.delete('/api/persons/:id', (request, response, next) => {
   const id = request.params.id
 
@@ -120,7 +139,6 @@ const unknownEndpoint = (request, response) => {
 }
 
 app.use(unknownEndpoint)
-
 
 app.use(errorHandler)
 
