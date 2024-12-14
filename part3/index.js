@@ -63,9 +63,6 @@ const generateId = () => {
     return String(randomId)
 }
 
-const isDuplicateName = (name) => {
-  return persons.some(person => person.name.toLowerCase() === name.toLowerCase())
-}
   
 app.post('/api/persons', (request, response) => {
     const body = request.body
@@ -80,12 +77,6 @@ app.post('/api/persons', (request, response) => {
     console.log("no number")
     return response.status(400).json({
       error: 'missing number'
-    })
-  }
-
-  if (isDuplicateName(body.name)) {
-    return response.status(400).json({
-      error: 'name must be unique (case insensitive)'
     })
   }
 
