@@ -1,7 +1,8 @@
-const { test, describe, after } = require('node:test')
+const { test, describe, after, beforeEach } = require('node:test')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
+const helper = require('./test_helper')
 const Blog = require('../models/blog')
 
 const api = supertest(app)
@@ -9,7 +10,7 @@ const api = supertest(app)
 beforeEach(async () => {
     await Blog.deleteMany({})
     await Blog.insertMany(helper.initialBlogs)
-  })
+})
 
 describe('testing GET requests', () => {
     test('blogs are returned as json', async () => {
