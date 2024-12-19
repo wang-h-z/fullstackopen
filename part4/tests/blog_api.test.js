@@ -1,4 +1,5 @@
 const { test, describe, after, beforeEach } = require('node:test')
+const assert = require('node:assert')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
@@ -19,12 +20,15 @@ describe('testing GET requests', () => {
           .expect(200)
           .expect('Content-Type', /application\/json/)
         })
-    
-    after(async () => {
-            await mongoose.connection.close()
-    })
 
-    
+    test('returns the correct amout of blog posts', async () => {
+        const response = await api.get('/api/blogs')
+        assert.strictEqual(response.body.length, helper.initialBlogs.length)
+    })
+})
+
+after(async () => {
+    await mongoose.connection.close()
 })
 
 
