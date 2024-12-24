@@ -120,7 +120,7 @@ app.put('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndUpdate(id, person, {
     new: true,
     runValidators: true,
-    cotnext: 'query',
+    context: 'query',
   })
     .then((updatedPerson) => {
       if (!updatedPerson) {

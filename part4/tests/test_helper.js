@@ -42,7 +42,7 @@ const blogsMissingFields = [
 const nonExistingId = async () => {
     const blog = new Blog({ title: 'Temp Blog', author: 'Temp Author', url: 'http://temp.com' });
     await blog.save();
-    await blog.deleteOne();  // Delete the blog to ensure it doesn't exist
+    await blog.deleteOne(); 
     return blog._id.toString();
 };
 

@@ -111,9 +111,28 @@ describe('deleting a blog post', () => {
 
         assert.strictEqual(response.body.error, 'Blog not found');
     });
-
 });
 
+describe('updating a blog', () => {
+    test('updates likes for an existing blog', async () => {
+        const blogsAtStart = await Blog.find({})
+        const blogToUpdate = blogsAtStart[0]
+        
+        const updatedBlog = {
+            title: blogToUpdate.title,
+            author: blogToUpdate.author,
+            url: blogToUpdate.url,
+            likes: blogToUpdate.likes + 5
+        }
+
+        const response = await api
+            .put(`/api/blogs/${blogToUpdate.id}`)
+            .send(updatedBlog)
+            .expect(200)
+        
+        assert.strictEqual(response.body.likes, updatedBlog.likes)
+    })
+})
 
 after(async () => {
     await mongoose.connection.close()
