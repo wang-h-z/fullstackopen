@@ -41,16 +41,9 @@ describe('testing POST requests', () => {
     test('blogs are successfuly created', async () => {
 
         const blogsBeforPost = await Blog.find({})
-
-        const newBlog = {
-            title: 'New Blog',
-            author: 'Jane Doe',
-            url: 'http://example.com/new',
-            likes: 7,
-          };
         
         const response = await api.post('/api/blogs')
-            .send(newBlog)
+            .send(helper.newBlog)
             .expect(201) 
             .expect('Content-Type', /application\/json/);
         
@@ -62,14 +55,9 @@ describe('testing POST requests', () => {
     })
 
     test('if likes is missing, defaults to 0', async () => {
-        const newBlog = {
-          title: 'Default Likes Blog',
-          author: 'John Doe',
-          url: 'http://example.com/default',
-        };
       
         const response = await api.post('/api/blogs')
-          .send(newBlog)
+          .send(helper.blogWithoutLikes)
           .expect(201) 
           .expect('Content-Type', /application\/json/);
       
@@ -80,12 +68,8 @@ describe('testing POST requests', () => {
 
       test('returns 400 if title or url is missing', async () => {
         const blogsBeforPost = await Blog.find({})
-        const blogs = [
-            { author: 'John Doe', url: 'http://example.com', likes: 10 }, 
-            { title: 'Missing URL', author: 'Jane Doe', likes: 5 },         
-        ];
     
-        for (const blog of blogs) {
+        for (const blog of helper.blogsMissingFields) {
             const response = await api.post('/api/blogs')
                 .send(blog)
                 .expect(400)  

@@ -19,6 +19,27 @@ const initialBlogs = [
     }
 ]
 
+const newBlog = {
+    title: 'New Blog',
+    author: 'Jane Doe',
+    url: 'http://example.com/new',
+    likes: 7
+};
+
+const blogWithoutLikes = {
+    title: 'Default Likes Blog',
+    author: 'John Doe',
+    url: 'http://example.com/default'
+};
+
+const blogsMissingFields = [
+    { author: 'John Doe', url: 'http://example.com', likes: 10 },  // missing title
+    { title: 'Missing URL', author: 'Jane Doe', likes: 5 },         // missing url
+];
+
 module.exports = {
     initialBlogs,
+    newBlog,
+    blogWithoutLikes,
+    blogsMissingFields
 }
