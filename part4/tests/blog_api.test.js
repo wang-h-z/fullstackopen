@@ -77,6 +77,29 @@ describe('testing POST requests', () => {
       
         assert.strictEqual(savedBlog.likes, 0, 'Likes should default to 0 if missing');
       });
+
+      test('returns 400 if title or url is missing', async () => {
+        const blogsBeforPost = await Blog.find({})
+        const blogs = [
+            { author: 'John Doe', url: 'http://example.com', likes: 10 }, 
+            { title: 'Missing URL', author: 'Jane Doe', likes: 5 },         
+        ];
+    
+        for (const blog of blogs) {
+            const response = await api.post('/api/blogs')
+                .send(blog)
+                .expect(400)  
+                .expect('Content-Type', /application\/json/);
+    
+            assert.ok(
+                response.body.error.includes('title') || response.body.error.includes('url'),
+                'Response error message should mention missing title or url'
+            );
+        }
+    
+        const blogsAtEnd = await Blog.find({});
+        assert.strictEqual(blogsAtEnd.length, blogsBeforPost.length, 'No blogs should be added when validation fails');
+    });
 })
 
 after(async () => {
