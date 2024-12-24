@@ -60,6 +60,23 @@ describe('testing POST requests', () => {
         const titles = blogsAfterPost.map(blog => blog.title);
         assert.ok(titles.includes('New Blog'), 'Blog title should exist in the database')
     })
+
+    test('if likes is missing, defaults to 0', async () => {
+        const newBlog = {
+          title: 'Default Likes Blog',
+          author: 'John Doe',
+          url: 'http://example.com/default',
+        };
+      
+        const response = await api.post('/api/blogs')
+          .send(newBlog)
+          .expect(201) 
+          .expect('Content-Type', /application\/json/);
+      
+        const savedBlog = await Blog.findOne({ title: 'Default Likes Blog' });
+      
+        assert.strictEqual(savedBlog.likes, 0, 'Likes should default to 0 if missing');
+      });
 })
 
 after(async () => {
