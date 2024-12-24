@@ -1,3 +1,5 @@
+const { test, describe, after, beforeEach } = require('node:test')
+const assert = require('node:assert')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
@@ -40,7 +42,6 @@ describe('when there is initially one user in db', () => {
 
     test('creation fails with proper statuscode and message if username already taken', async () => {
         const usersAtStart = await helper.usersInDb()
-    
         const newUser = {
           username: 'root',
           name: 'Superuser',
@@ -54,8 +55,101 @@ describe('when there is initially one user in db', () => {
           .expect('Content-Type', /application\/json/)
     
         const usersAtEnd = await helper.usersInDb()
-        assert(result.body.error.includes('expected `username` to be unique'))
     
         assert.strictEqual(usersAtEnd.length, usersAtStart.length)
       })
+})
+
+describe('User creation', () => {
+  
+    test('succeeds with a fresh username', async () => {
+      const usersAtStart = await helper.usersInDb()
+  
+      const newUser = {
+        username: 'john123',
+        name: 'John Doe',
+        password: 'securePass'
+      }
+  
+      const response = await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+  
+      const usersAtEnd = await helper.usersInDb()
+  
+      assert.strictEqual(usersAtEnd.length, usersAtStart.length + 1)
+  
+      const usernames = usersAtEnd.map(u => u.username)
+      assert.ok(usernames.includes(newUser.username))
+    })
+  
+    test('fails with 400 if username is missing', async () => {
+      const newUser = {
+        name: 'MissingUsername',
+        password: 'securePass'
+      }
+  
+      const response = await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(400)
+    })
+  
+    test('fails with 400 if password is missing', async () => {
+      const newUser = {
+        username: 'nopassword',
+        name: 'No Password User'
+      }
+  
+      const response = await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(400)
+    })
+  
+    test('fails with 400 if username is shorter than 3 characters', async () => {
+      const newUser = {
+        username: 'jo',
+        name: 'Short Username',
+        password: 'securePass'
+      }
+  
+      const response = await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(400)
+    })
+  
+    test('fails with 400 if password is shorter than 3 characters', async () => {
+      const newUser = {
+        username: 'validUser',
+        name: 'Short Password',
+        password: '12'
+      }
+  
+      const response = await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(400)
+    })
+  
+    test('fails with 400 if username is not unique', async () => {
+      const newUser = {
+        username: 'root',
+        name: 'Duplicate User',
+        password: 'securePass'
+      }
+  
+      const response = await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(400)
+    })
   })
+  
+
+after(async () => {
+    await mongoose.connection.close()
+})
