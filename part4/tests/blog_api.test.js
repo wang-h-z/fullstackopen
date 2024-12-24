@@ -111,6 +111,16 @@ describe('deleting a blog post', () => {
 
         assert.strictEqual(response.body.error, 'Blog not found');
     });
+
+    test('returns 400 for malformed blog ID', async () => {
+        const invalidId = '12345invalid';
+    
+        const response = await api
+            .delete(`/api/blogs/${invalidId}`)
+            .expect(400)
+    
+        assert.strictEqual(response.body.error, 'malformatted id');
+    });
 });
 
 describe('updating a blog', () => {
