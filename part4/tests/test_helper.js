@@ -1,3 +1,5 @@
+const Blog = require('../models/blog')
+
 const initialBlogs = [
     {
       title: 'Go To Statement Considered Harmful',
@@ -37,9 +39,17 @@ const blogsMissingFields = [
     { title: 'Missing URL', author: 'Jane Doe', likes: 5 },         // missing url
 ];
 
+const nonExistingId = async () => {
+    const blog = new Blog({ title: 'Temp Blog', author: 'Temp Author', url: 'http://temp.com' });
+    await blog.save();
+    await blog.deleteOne();  // Delete the blog to ensure it doesn't exist
+    return blog._id.toString();
+};
+
 module.exports = {
     initialBlogs,
     newBlog,
     blogWithoutLikes,
-    blogsMissingFields
+    blogsMissingFields,
+    nonExistingId,
 }

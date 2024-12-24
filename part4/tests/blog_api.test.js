@@ -86,8 +86,36 @@ describe('testing POST requests', () => {
     });
 })
 
+describe('deleting a blog post', () => {
+    test('deletes a blog successfully with status 204', async () => {
+        const blogsAtStart = await Blog.find({});
+        const blogToDelete = blogsAtStart[0];
+
+        await api
+            .delete(`/api/blogs/${blogToDelete.id}`)
+            .expect(204);  
+
+        const blogsAtEnd = await Blog.find({});
+        assert.strictEqual(blogsAtEnd.length, blogsAtStart.length - 1);
+
+        const ids = blogsAtEnd.map(b => b.id);
+        assert.ok(!ids.includes(blogToDelete.id), 'Deleted blog should not exist');
+    });
+
+    test('returns 404 if blog does not exist', async () => {
+        const nonExistingId = await helper.nonExistingId(); 
+
+        const response = await api
+            .delete(`/api/blogs/${nonExistingId}`)
+            .expect(404);  
+
+        assert.strictEqual(response.body.error, 'Blog not found');
+    });
+
+});
+
+
 after(async () => {
     await mongoose.connection.close()
 })
-
 
