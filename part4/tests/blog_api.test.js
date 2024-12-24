@@ -37,6 +37,31 @@ describe('testing GET requests', () => {
     })
 })
 
+describe('testing POST requests', () => {
+    test('blogs are successfuly created', async () => {
+
+        const blogsBeforPost = await Blog.find({})
+
+        const newBlog = {
+            title: 'New Blog',
+            author: 'Jane Doe',
+            url: 'http://example.com/new',
+            likes: 7,
+          };
+        
+        const response = await api.post('/api/blogs')
+            .send(newBlog)
+            .expect(201) 
+            .expect('Content-Type', /application\/json/);
+        
+        const blogsAfterPost = await Blog.find({});
+        assert.strictEqual(blogsAfterPost.length, blogsBeforPost.length + 1); 
+        
+        const titles = blogsAfterPost.map(blog => blog.title);
+        assert.ok(titles.includes('New Blog'), 'Blog title should exist in the database')
+    })
+})
+
 after(async () => {
     await mongoose.connection.close()
 })
