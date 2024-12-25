@@ -11,7 +11,7 @@ const User = require('../models/user')
 describe('when there is initially one user in db', () => {
     beforeEach(async () => {
       await User.deleteMany({})
-  
+      await new Promise(resolve => setTimeout(resolve, 100)) 
       const passwordHash = await bcrypt.hash('sekret', 10)
       const user = new User({ username: 'root', passwordHash })
   
