@@ -1,7 +1,5 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
-const User = require('../models/user')
-const jwt = require('jsonwebtoken')
 const middleware = require('../utils/middleware')
 
 blogsRouter.get('/', async (request, response) => {
@@ -15,7 +13,6 @@ blogsRouter.post('/', middleware.userExtractor, async (request, response) => {
     if (!user) {
       return response.status(401).json({ error: 'token invalid' })
     }
-    
     
     const blog = new Blog({
       ...request.body,
@@ -40,10 +37,10 @@ blogsRouter.delete('/:id', middleware.userExtractor, async (request, response) =
       return response.status(401).json({ error: 'token invalid' })
     }
 
-    const deletedBlog = await Blog.findById(id)
+    const deletedBlog = await Blog.findById(id).populate('user')
     
     if (deletedBlog) {
-      if (deletedBlog.user.toString() !== request.user) {
+      if (deletedBlog.user.toString() !== request.user.toString()) {
         return response.status(401).json({error: 'invalid user'})
       }
       await Blog.findByIdAndDelete(id)

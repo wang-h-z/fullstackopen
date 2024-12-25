@@ -5,11 +5,28 @@ const supertest = require('supertest')
 const app = require('../app')
 const helper = require('./test_helper')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const api = supertest(app)
 
+let token
+
 beforeEach(async () => {
     await Blog.deleteMany({})
+
+    const newUser = { 
+        username: 'testUser',
+        name: 'testUser',
+        password: 'password123'
+    }
+
+    await api.post('/api/users').send(newUser)
+    const tokenResponse = await api.post('/api/login').send({
+        username: 'testUser',
+        password: 'password123'
+    })
+
+    token = tokenResponse.body.token
     await Blog.insertMany(helper.initialBlogs)
 })
 
@@ -43,6 +60,7 @@ describe('testing POST requests', () => {
         const blogsBeforPost = await Blog.find({})
         
         const response = await api.post('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .send(helper.newBlog)
             .expect(201) 
             .expect('Content-Type', /application\/json/);
@@ -57,6 +75,7 @@ describe('testing POST requests', () => {
     test('if likes is missing, defaults to 0', async () => {
       
         const response = await api.post('/api/blogs')
+          .set('Authorization', `Bearer ${token}`)
           .send(helper.blogWithoutLikes)
           .expect(201) 
           .expect('Content-Type', /application\/json/);
@@ -71,6 +90,7 @@ describe('testing POST requests', () => {
     
         for (const blog of helper.blogsMissingFields) {
             const response = await api.post('/api/blogs')
+                .set('Authorization', `Bearer ${token}`)
                 .send(blog)
                 .expect(400)  
                 .expect('Content-Type', /application\/json/);
@@ -83,23 +103,42 @@ describe('testing POST requests', () => {
     
         const blogsAtEnd = await Blog.find({});
         assert.strictEqual(blogsAtEnd.length, blogsBeforPost.length, 'No blogs should be added when validation fails');
-    });
+      });
+
+      test('returns 401 Unauthorized if token is missing when creating a blog', async () => {
+        const newBlog = {
+          title: 'Blog without token',
+          author: 'Jane Doe',
+          url: 'http://example.com/blog',
+          likes: 10
+        }
+      
+        const response = await api.post('/api/blogs')
+          .send(newBlog)
+          .expect(401)
+      
+        assert.strictEqual(response.body.error, 'token invalid')
+      });      
 })
 
 describe('deleting a blog post', () => {
     test('deletes a blog successfully with status 204', async () => {
+        const response = await api.post('/api/blogs').set('Authorization', `Bearer ${token}`).send(helper.newBlog)
         const blogsAtStart = await Blog.find({});
-        const blogToDelete = blogsAtStart[0];
-
+        console.log(response.body)
+        
         await api
-            .delete(`/api/blogs/${blogToDelete.id}`)
+            .delete(`/api/blogs/${response.body.id}`)
+            .set('Authorization', `Bearer ${token}`)
             .expect(204);  
 
         const blogsAtEnd = await Blog.find({});
+        console.log(blogsAtStart)
+        console.log(blogsAtEnd)
         assert.strictEqual(blogsAtEnd.length, blogsAtStart.length - 1);
 
         const ids = blogsAtEnd.map(b => b.id);
-        assert.ok(!ids.includes(blogToDelete.id), 'Deleted blog should not exist');
+        assert.ok(!ids.includes(response.body.id), 'Deleted blog should not exist');
     });
 
     test('returns 404 if blog does not exist', async () => {
@@ -107,6 +146,7 @@ describe('deleting a blog post', () => {
 
         const response = await api
             .delete(`/api/blogs/${nonExistingId}`)
+            .set('Authorization', `Bearer ${token}`)
             .expect(404);  
 
         assert.strictEqual(response.body.error, 'Blog not found');
@@ -117,6 +157,7 @@ describe('deleting a blog post', () => {
     
         const response = await api
             .delete(`/api/blogs/${invalidId}`)
+            .set('Authorization', `Bearer ${token}`)
             .expect(400)
     
         assert.strictEqual(response.body.error, 'malformatted id');
@@ -137,6 +178,7 @@ describe('updating a blog', () => {
 
         const response = await api
             .put(`/api/blogs/${blogToUpdate.id}`)
+            .set('Authorization', `Bearer ${token}`)
             .send(updatedBlog)
             .expect(200)
         
