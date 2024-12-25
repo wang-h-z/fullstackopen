@@ -2,29 +2,20 @@ const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
-const tokenExtractor = require('../utils/middleware')
-
-const getTokenFrom = request => {
-  const authorization = request.get('authorization')
-  if (authorization && authorization.startsWith('Bearer ')) {
-    return authorization.replace('Bearer ', '')
-  }
-  return null
-}
+const middleware = require('../utils/middleware')
 
 blogsRouter.get('/', async (request, response) => {
     const blogs = await Blog.find({}).populate('user', { username: 1, name: 1, id: 1 })
     response.json(blogs)
 })
   
-blogsRouter.post('/',  async (request, response) => {
+blogsRouter.post('/', middleware.userExtractor, async (request, response) => {
     
-    const decodedToken = jwt.verify(request.token, process.env.SECRET)
-    if (!decodedToken.id) {
+    const user = request.user
+    if (!user) {
       return response.status(401).json({ error: 'token invalid' })
     }
-    console.log(decodedToken.id)
-    const user = await User.findById(decodedToken.id)
+    
     
     const blog = new Blog({
       ...request.body,
@@ -43,18 +34,16 @@ blogsRouter.post('/',  async (request, response) => {
     response.status(201).json(savedBlog)
 })
 
-blogsRouter.delete('/:id', async (request, response) => {
+blogsRouter.delete('/:id', middleware.userExtractor, async (request, response) => {
     const id = request.params.id
-    const decodedToken = jwt.verify(request.token, process.env.SECRET)
-    if (!decodedToken.id) {
+    if (!request.user) {
       return response.status(401).json({ error: 'token invalid' })
     }
 
     const deletedBlog = await Blog.findById(id)
     
     if (deletedBlog) {
-      if (deletedBlog.user.toString() !== decodedToken.id) {
-        console.log(deletedBlog.user.id.toString())
+      if (deletedBlog.user.toString() !== request.user) {
         return response.status(401).json({error: 'invalid user'})
       }
       await Blog.findByIdAndDelete(id)
