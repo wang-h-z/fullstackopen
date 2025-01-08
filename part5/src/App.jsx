@@ -9,6 +9,11 @@ import './App.css'
 const App = () => {
   const [errorMessage, setErrorMessage] = useState(null)
   const [blogs, setBlogs] = useState([])
+  const [newBlog, setNewBlog] = useState({
+    title: '',
+    author: '',
+    url: '',
+  })
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -20,10 +25,11 @@ const App = () => {
   }, [])
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedNoteappUser')
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
+      blogService.setToken(user.token)
     }
   }, [])
 
@@ -48,10 +54,24 @@ const App = () => {
     }
   }
 
+  const addBlog = async (event) => {
+    event.preventDefault()
+    const createdBlog = await blogService.create(newBlog)
+    setBlogs(blogs.concat(createdBlog))
+    setNewBlog({ title: '', author: '', url: '' }) 
+  }
+
+  const handleBlogChange = event => {
+    const {name, value} = event.target
+    setNewBlog((newBlog) => ({
+      ...newBlog,
+      [name]: value,
+    }))
+  }
+
   const handleLogout = () => {
     window.localStorage.clear()
     setUser(null)
-    console.log("CLEARRRRR")
   }
 
   if (user === null) {
@@ -76,7 +96,9 @@ const App = () => {
         <Blog key={blog.id} blog={blog} />
       )}
       <BlogForm
-        
+        addBlog={addBlog}
+        newBlog={newBlog}
+        handleBlogChange={handleBlogChange}
       />
     </div>
   )
