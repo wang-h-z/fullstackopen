@@ -4,10 +4,10 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
-import './App.css'
+import Notification from './components/Notification'
 
 const App = () => {
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [notification, setNotification] = useState(null)
   const [blogs, setBlogs] = useState([])
   const [newBlog, setNewBlog] = useState({
     title: '',
@@ -33,6 +33,13 @@ const App = () => {
     }
   }, [])
 
+  const handleNotification = (message, error) => {
+    setNotification({ message, error })
+    setTimeout(() => {
+      setNotification(null)
+    }, 5000)
+  }
+
   const handleLogin = async (event) => {
     event.preventDefault()
     try {
@@ -47,10 +54,7 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      setErrorMessage('Wrong credentials')
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
+      handleNotification("wrong username or password", 'error')
     }
   }
 
@@ -59,6 +63,7 @@ const App = () => {
     const createdBlog = await blogService.create(newBlog)
     setBlogs(blogs.concat(createdBlog))
     setNewBlog({ title: '', author: '', url: '' }) 
+    handleNotification(`a new blog ${createdBlog.title} by ${createdBlog.author} added`, 'success')
   }
 
   const handleBlogChange = event => {
@@ -76,17 +81,25 @@ const App = () => {
 
   if (user === null) {
     return (
-      <LoginForm 
-        handleLogin={handleLogin} 
-        username={username} 
-        setUsername={setUsername} 
-        password={password} 
-        setPassword={setPassword} 
-      />
+      <div>
+        <Notification
+          notification={notification}
+        />
+        <LoginForm 
+          handleLogin={handleLogin} 
+          username={username} 
+          setUsername={setUsername} 
+          password={password} 
+          setPassword={setPassword} 
+        />
+      </div>
     )
   }
   return (
     <div>
+        <Notification
+          notification={notification}
+        />
       <h2>blogs</h2>
         <div className="user-container">
           <p>{user.name} logged in</p>
