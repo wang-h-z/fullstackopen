@@ -3,6 +3,7 @@ import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import LoginForm from './components/LoginForm'
+import './App.css'
 
 const App = () => {
   const [errorMessage, setErrorMessage] = useState(null)
@@ -32,7 +33,7 @@ const App = () => {
         username, password,
       })
       window.localStorage.setItem(
-        'loggedNoteappUser', JSON.stringify(user)
+        'loggedBlogappUser', JSON.stringify(user)
       )
       setUser(user)
       setUsername('')
@@ -45,6 +46,11 @@ const App = () => {
     }
   }
 
+  const handleLogout = () => {
+    window.localStorage.clear()
+    setUser(null)
+    console.log("CLEARRRRR")
+  }
 
   if (user === null) {
     return (
@@ -60,7 +66,10 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
-      <p>{user.name} logged in</p>
+        <div className="user-container">
+          <p>{user.name} logged in</p>
+          <button onClick={() => handleLogout()}>logout</button>
+        </div>
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
       )}
