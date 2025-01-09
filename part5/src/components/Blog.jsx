@@ -13,6 +13,11 @@ const Blog = ({ blog, addLike }) => {
   const hideWhenVisible = { display: showDetails ? 'none' : '' }
   const showWhenVisible = { display: showDetails ? '' : 'none' }
   
+  const handleLike = () => {
+    addLike(blog)
+    console.log("Blog prop:", blog)
+  }
+
   return (
   <div>
     <div style={{...blogStyle, ...hideWhenVisible}}>
@@ -23,7 +28,7 @@ const Blog = ({ blog, addLike }) => {
       {blog.title} 
       <button onClick={() => setShowDetails(!showDetails)}>hide</button>
       <div>{blog.url}</div>
-      <div>likes {blog.likes} <button onClick={() => addLike(blog)}>like</button></div>
+      <div>likes {blog.likes} <button onClick={handleLike}>like</button></div>
       <div>{blog.user?.username}</div>
     </div> 
   </div>  
