@@ -60,27 +60,33 @@ const App = () => {
     }
   }
 
+  const sortBlogsByLikes = (blogs) => {
+    return [...blogs].sort((a, b) => b.likes - a.likes)
+  }
+
   const addBlog = (blogObject) => {
-    const createdBlog = blogService.create(blogObject).then(blogObject => {
-      setBlogs(blogs.concat(blogObject))
+    blogService.create(blogObject).then((createdBlog) => {
+      const updatedBlogs = sortBlogsByLikes(blogs.concat(createdBlog))
+      setBlogs(updatedBlogs)
+      blogFormRef.current.toggleVisibility()
+      handleNotification(`A new blog "${createdBlog.title}" by ${createdBlog.author} added`, 'success')
     })
-    blogFormRef.current.toggleVisibility()
-    handleNotification(`a new blog ${blogObject.title} by ${blogObject.author} added`, 'success')
   }
 
   const addLike = (blog) => {
     const updatedBlog = {
-      ...blog, 
-      likes: blog.likes + 1, 
+      ...blog,
+      likes: blog.likes + 1,
     }
   
     blogService.update(updatedBlog).then((returnedBlog) => {
-      setBlogs(blogs.map((currentBlog) =>
+      const updatedBlogs = blogs.map((currentBlog) =>
         currentBlog.id === blog.id ? returnedBlog : currentBlog
-      ))
+      )
+      setBlogs(sortBlogsByLikes(updatedBlogs))
     })
   }
-
+  
   const handleLogout = () => {
     window.localStorage.clear()
     setUser(null)
