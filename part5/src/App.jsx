@@ -59,20 +59,11 @@ const App = () => {
     }
   }
 
-  const addBlog = async (event) => {
-    event.preventDefault()
-    const createdBlog = await blogService.create(newBlog)
-    setBlogs(blogs.concat(createdBlog))
-    setNewBlog({ title: '', author: '', url: '' }) 
-    handleNotification(`a new blog ${createdBlog.title} by ${createdBlog.author} added`, 'success')
-  }
-
-  const handleBlogChange = event => {
-    const {name, value} = event.target
-    setNewBlog((newBlog) => ({
-      ...newBlog,
-      [name]: value,
-    }))
+  const addBlog = (blogObject) => {
+    const createdBlog = blogService.create(blogObject).then(blogObject => {
+      setBlogs(blogs.concat(blogObject))
+    })
+    handleNotification(`a new blog ${blogObject.title} by ${blogObject.author} added`, 'success')
   }
 
   const handleLogout = () => {
@@ -108,9 +99,7 @@ const App = () => {
         </div>
       <Togglable buttonLabel="new blog">
         <BlogForm
-          addBlog={addBlog}
-          newBlog={newBlog}
-          handleBlogChange={handleBlogChange}
+          createBlog={addBlog}
         />
       </Togglable>
       {blogs.map(blog =>
