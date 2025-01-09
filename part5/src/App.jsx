@@ -21,9 +21,10 @@ const App = () => {
   const blogFormRef = useRef()
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )  
+    blogService.getAll().then(blogs => {
+      const sortedBlogs = sortBlogsByLikes(blogs)
+      setBlogs(sortedBlogs)
+    })  
   }, [])
 
   useEffect(() => {
@@ -86,6 +87,13 @@ const App = () => {
       setBlogs(sortBlogsByLikes(updatedBlogs))
     })
   }
+
+  const deleteBlog = (blog) => {
+    blogService.remove(blog.id).then((returnedBlog) => {
+      const updatedBlogs = blogs.filter((currentBlog) => currentBlog.id !== blog.id)
+      setBlogs(sortBlogsByLikes(updatedBlogs))
+    })
+  }
   
   const handleLogout = () => {
     window.localStorage.clear()
@@ -123,11 +131,9 @@ const App = () => {
           createBlog={addBlog}
         />
       </Togglable>
-
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} addLike={addLike} />
+        <Blog key={blog.id} blog={blog} addLike={addLike} deleteBlog={deleteBlog} user={user} />
       )}
-
     </div>
   )
 }
