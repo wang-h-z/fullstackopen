@@ -21,6 +21,11 @@ const create = async (newObject) => {
   return response.data
 }
 
+const update = async (updatedObject) => {
+  console.log("Updated object:", updatedObject)
+  const response = await axios.put(`${baseUrl}/${updatedObject.id}`, updatedObject)
+  return response.data
+}
 
 
-export default { getAll, create, setToken }
+export default { getAll, create, setToken, update }

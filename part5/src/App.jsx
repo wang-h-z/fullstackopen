@@ -68,6 +68,19 @@ const App = () => {
     handleNotification(`a new blog ${blogObject.title} by ${blogObject.author} added`, 'success')
   }
 
+  const addLike = (blog) => {
+    const updatedBlog = {
+      ...blog, 
+      likes: blog.likes + 1, 
+    }
+  
+    blogService.update(updatedBlog).then((returnedBlog) => {
+      setBlogs(blogs.map((currentBlog) =>
+        currentBlog.id === blog.id ? returnedBlog : currentBlog
+      ))
+    })
+  }
+
   const handleLogout = () => {
     window.localStorage.clear()
     setUser(null)
@@ -104,9 +117,11 @@ const App = () => {
           createBlog={addBlog}
         />
       </Togglable>
+
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} addLike={addLike} />
       )}
+
     </div>
   )
 }

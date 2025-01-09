@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, addLike }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -23,7 +23,7 @@ const Blog = ({ blog }) => {
       {blog.title} 
       <button onClick={() => setShowDetails(!showDetails)}>hide</button>
       <div>{blog.url}</div>
-      <div>likes {blog.likes} <button>like</button></div>
+      <div>likes {blog.likes} <button onClick={() => addLike(blog)}>like</button></div>
       <div>{blog.user?.username}</div>
     </div> 
   </div>  
