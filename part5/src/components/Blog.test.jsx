@@ -54,6 +54,7 @@ test('like button is clicked twice and event handler is called twice', async () 
 
     const viewButton = screen.getByText('view')
     await userEventHandler.click(viewButton)
+    
     const likeButton = screen.getByText('like')
     await userEventHandler.click(likeButton)
     await userEventHandler.click(likeButton)
