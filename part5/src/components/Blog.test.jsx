@@ -44,4 +44,18 @@ test('url and likes are shown when view button is pressed', async () => {
     expect(screen.getByText(blog.url)).toBeInTheDocument()
     expect(screen.getByText(`likes ${blog.likes}`)).toBeInTheDocument()
 })
-  
+
+
+test('like button is clicked twice and event handler is called twice', async () => {
+    const mockHandler = vi.fn();
+    render(<Blog blog={blog} user={user} addLike={mockHandler} deleteBlog={mockHandler} />)
+
+    const userEventHandler = userEvent.setup()
+
+    const viewButton = screen.getByText('view')
+    await userEventHandler.click(viewButton)
+    const likeButton = screen.getByText('like')
+    await userEventHandler.click(likeButton)
+    await userEventHandler.click(likeButton)
+    expect(mockHandler.mock.calls).toHaveLength(2)
+})
