@@ -1,5 +1,5 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
-const { loginWith, addDefaultTestBlog, viewMostRecentlyAddedBlog } = require('./helper')
+const { loginWith, addDefaultTestBlog, viewMostRecentlyAddedBlog, logOut } = require('./helper')
 
 describe('Blog app', () => {
     beforeEach(async ({ page, request }) => {
@@ -9,6 +9,14 @@ describe('Blog app', () => {
             name: 'Matti Luukkainen',
             username: 'mluukkai',
             password: 'salainen'
+            }
+        })
+
+        await request.post('http://localhost:3003/api/users', {
+            data: {
+            name: 'Villain',
+            username: 'villain',
+            password: 'muahaha'
             }
         })
 
@@ -74,5 +82,17 @@ describe('Blog app', () => {
         await expect(blog).not.toBeVisible();
     })
     
+    test('only logged in user can see the delete button', async ({page}) => {
+        await addDefaultTestBlog(page)
+        await page.getByText('Test Title Test Author').waitFor()
+
+        await logOut(page)
+
+        await loginWith(page, 'villain', 'muahaha')
+        await page.getByText('Test Title Test Author').waitFor()
+        
+        await viewMostRecentlyAddedBlog(page)
+        await expect(page.getByRole('button', { name: 'remove '})).not.toBeVisible()
+    })
   })
 })

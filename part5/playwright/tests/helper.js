@@ -18,4 +18,8 @@ const viewMostRecentlyAddedBlog = async (page) => {
     await testButton.click();
 }
 
-export { loginWith, addDefaultTestBlog, viewMostRecentlyAddedBlog }
+const logOut = async (page) => {
+    await page.getByRole('button', { name: 'logout'}).click()
+}
+
+export { loginWith, addDefaultTestBlog, viewMostRecentlyAddedBlog, logOut }
