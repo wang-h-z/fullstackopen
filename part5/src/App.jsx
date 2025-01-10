@@ -106,6 +106,7 @@ const App = () => {
         <Notification
           notification={notification}
         />
+        <h2>blogs</h2>
         <LoginForm 
           handleLogin={handleLogin} 
           username={username} 
