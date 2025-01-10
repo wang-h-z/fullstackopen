@@ -1,5 +1,5 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
-const { loginWith, addDefaultTestBlog } = require('./helper')
+const { loginWith, addDefaultTestBlog, viewMostRecentlyAddedBlog } = require('./helper')
 
 describe('Blog app', () => {
     beforeEach(async ({ page, request }) => {
@@ -46,19 +46,32 @@ describe('Blog app', () => {
     })
 
     test('an existing blog can be liked', async ({ page }) => {
-    await addDefaultTestBlog(page)
-    await page.getByText('Test Title Test Author').waitFor()
+        await addDefaultTestBlog(page)
+        await page.getByText('Test Title Test Author').waitFor()
 
-    const viewButtons = await page.getByRole('button').all();
-    const testButton = viewButtons[viewButtons.length - 1];
-    await testButton.click();
+        await viewMostRecentlyAddedBlog(page)
 
-    const likeButton = await page.getByRole('button', { name: 'like' });
-    await expect(likeButton).toBeVisible();
+        const likeButton = await page.getByRole('button', { name: 'like' });
+        await expect(likeButton).toBeVisible();
 
-    await likeButton.click();
-    const likesElement = await page.getByText('likes 1');
-    await expect(likesElement).toBeVisible();
+        await likeButton.click();
+        const likesElement = await page.getByText('likes 1');
+        await expect(likesElement).toBeVisible();
+    })
+
+    test('user can delete a blog', async ({ page }) => {
+        await addDefaultTestBlog(page)
+        await page.getByText('Test Title Test Author').waitFor()
+        
+        await viewMostRecentlyAddedBlog(page)
+
+        const removeButton = await page.getByRole('button', { name: 'remove' });
+        await expect(removeButton).toBeVisible();
+
+        await removeButton.click();
+
+        const blog = page.getByText('Test Title Test Author');
+        await expect(blog).not.toBeVisible();
     })
     
   })

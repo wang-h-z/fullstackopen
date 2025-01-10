@@ -12,4 +12,10 @@ const addDefaultTestBlog = async (page) => {
     await page.getByRole('button', { name: 'save' }).click()
 }
 
-export { loginWith, addDefaultTestBlog }
+const viewMostRecentlyAddedBlog = async (page) => {
+    const viewButtons = await page.getByRole('button').all();
+    const testButton = viewButtons[viewButtons.length - 1];
+    await testButton.click();
+}
+
+export { loginWith, addDefaultTestBlog, viewMostRecentlyAddedBlog }
