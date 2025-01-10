@@ -33,7 +33,8 @@ describe('Blog app', () => {
         await page.getByTestId('password').fill('wrong')
         await page.getByRole('button', { name: 'Login' }).click() 
 
-        await expect(page.getByText('wrong username or password')).toBeVisible()
+        const errorDiv = await page.locator('.error')
+        await expect(errorDiv).toContainText('wrong username or password')
     })
   })
 })
