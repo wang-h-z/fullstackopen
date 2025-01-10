@@ -22,4 +22,33 @@ const logOut = async (page) => {
     await page.getByRole('button', { name: 'logout'}).click()
 }
 
-export { loginWith, addDefaultTestBlog, viewMostRecentlyAddedBlog, logOut }
+const loginAndGetToken = async (request) => {
+    const response = await request.post('http://localhost:3003/api/login', {
+        data: {
+            username: 'mluukkai',
+            password: 'salainen'
+        }
+    });
+    const responseBody = await response.json();
+    return responseBody.token;
+}
+
+const populateBlogs = async (page, request, token) => {
+    for (let i = 0; i < 5; i++) {
+        await request.post('http://localhost:3003/api/blogs', {
+            headers: {
+                Authorization: `Bearer ${token}`
+            },
+            data: {
+            title: `testTitle${i}`,
+            author: `testAuthor${i}`,
+            url: `testURL${i}.com`,
+            likes: i
+            }
+        })
+        await page.reload()
+        await page.getByText(`testTitle${i} testAuthor${i}`).waitFor()
+    }
+}
+
+export { loginWith, addDefaultTestBlog, viewMostRecentlyAddedBlog, logOut, populateBlogs, loginAndGetToken }

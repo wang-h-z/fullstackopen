@@ -1,16 +1,17 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
-const { loginWith, addDefaultTestBlog, viewMostRecentlyAddedBlog, logOut } = require('./helper')
+const { loginWith, addDefaultTestBlog, viewMostRecentlyAddedBlog, logOut, populateBlogs, loginAndGetToken } = require('./helper')
 
 describe('Blog app', () => {
     beforeEach(async ({ page, request }) => {
         await request.post('http://localhost:3003/api/testing/reset')
-        await request.post('http://localhost:3003/api/users', {
+        const response = await request.post('http://localhost:3003/api/users', {
             data: {
             name: 'Matti Luukkainen',
             username: 'mluukkai',
             password: 'salainen'
             }
         })
+
 
         await request.post('http://localhost:3003/api/users', {
             data: {
@@ -82,7 +83,7 @@ describe('Blog app', () => {
         await expect(blog).not.toBeVisible();
     })
     
-    test('only logged in user can see the delete button', async ({page}) => {
+    test('only logged in user can see the delete button', async ({ page }) => {
         await addDefaultTestBlog(page)
         await page.getByText('Test Title Test Author').waitFor()
 
@@ -90,9 +91,28 @@ describe('Blog app', () => {
 
         await loginWith(page, 'villain', 'muahaha')
         await page.getByText('Test Title Test Author').waitFor()
-        
+
         await viewMostRecentlyAddedBlog(page)
         await expect(page.getByRole('button', { name: 'remove '})).not.toBeVisible()
+    })
+
+    test('ensure that blogs are arranged in order', async ({ page, request }) => {
+        const token = await loginAndGetToken(request)
+        await populateBlogs(page, request, token)
+
+        const allBlogs = await page.locator('.blog').all();
+        const likes = [];
+        for (const blog of allBlogs) {
+            const textContent = await blog.innerText();
+            const match = textContent.match(/likes (\d+)/); 
+            if (match) {
+                likes.push(parseInt(match[1], 10)); 
+            }
+        }
+
+        
+        const sortedLikes = [...likes].sort((a, b) => b - a); //create sorted copy
+        expect(likes).toEqual(sortedLikes); 
     })
   })
 })
