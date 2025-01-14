@@ -29,6 +29,9 @@ const reducer = (state = initialState, action) => {
                         : anecdote
                       )
     }
+    case 'CREATE_ANECDOTE': {
+      return state.concat(action.payload)
+    }
     default: return state
   }
 }
@@ -37,6 +40,18 @@ export const upVote = (id) => {
   return {
     type: 'VOTE',
     payload: {id}
+  }
+}
+
+export const addAnecdote = (content) => {
+  console.log('reducer called with: ', content)
+  return {
+    type: 'CREATE_ANECDOTE', 
+    payload: {
+      content: content,
+      id: getId(),
+      votes: 0
+    }
   }
 }
 
