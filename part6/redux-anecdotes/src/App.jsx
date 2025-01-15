@@ -15,14 +15,14 @@ const App = () => {
 
   const vote = (id) => {
     console.log('vote', id)
-    dispatch(upVote(id))
+    dispatch(upVote({id}))
   }
 
   const createAnecdote = (event) => {
     event.preventDefault()
     const content = event.target.anecdote.value
     event.target.anecdote.value = ''
-    dispatch(addAnecdote(content))
+    dispatch(addAnecdote({content}))
   }
 
   return (
