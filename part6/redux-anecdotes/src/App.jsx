@@ -2,9 +2,15 @@ import { useSelector, useDispatch } from 'react-redux'
 import { upVote, addAnecdote } from './reducers/anecdoteReducer'
 import AnecdoteForm from './components/AnecdoteForm'
 import AnecdoteList from './components/AnecdoteList'
+import Filter from './components/Filter'
 
 const App = () => {
-  const anecdotes = useSelector(state => state)
+  const anecdotes = useSelector(state => {
+    if (state.filter === '') {
+      return state.anecdotes
+    }
+    return state.anecdotes.filter(anecdote => anecdote.content.toLowerCase().includes(state.filter))
+  })
   const dispatch = useDispatch()
 
   const vote = (id) => {
@@ -22,6 +28,7 @@ const App = () => {
   return (
     <div>
       <h2>Anecdotes</h2>
+      <Filter></Filter>
       <AnecdoteList anecdotes={anecdotes} vote={vote}></AnecdoteList>
       <AnecdoteForm createAnecdote={createAnecdote}/>
     </div>

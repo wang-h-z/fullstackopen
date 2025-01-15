@@ -19,7 +19,7 @@ const asObject = (anecdote) => {
 
 const initialState = anecdotesAtStart.map(asObject).sort((a,b) => b.votes - a.votes)
 
-const reducer = (state = initialState, action) => {
+const anecdoteReducer = (state = initialState, action) => {
   console.log('state now: ', state)
   console.log('action', action)
   switch (action.type) {
@@ -44,7 +44,6 @@ export const upVote = (id) => {
 }
 
 export const addAnecdote = (content) => {
-  console.log('reducer called with: ', content)
   return {
     type: 'CREATE_ANECDOTE', 
     payload: {
@@ -55,4 +54,4 @@ export const addAnecdote = (content) => {
   }
 }
 
-export default reducer
+export default anecdoteReducer
